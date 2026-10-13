@@ -240,3 +240,7 @@ Response body:
 ```
 
 `PUT` /users/{id}/ - Make changes to user profile (only for profile owner)
+
+## Database diagram
+
+![Database diagram](db_diagram.png)
