@@ -45,7 +45,30 @@ Request params:
     }
 ```
 
-`GET` /artists/{artist-slug}/ - Get specific artist article.
+Response body:
+
+```json
+    {
+        "items": { "id": string, "artist": string, "genres": string[] }[],
+        "pagination": { "current_page": number, "total_pages": number, "total_records": number }
+    }
+```
+
+`GET` /artists/{id}/ - Get specific artist article.
+
+Response body:
+
+```json
+    {
+        "id": string,
+        "artist": string,
+        "genres": string[],
+        "body": { "title": string, "content": string }[],
+        "contributors": { "id": string, "name": string }[],
+        "created_at": string,
+        "updated_at": string
+    }
+```
 
 `POST` /artists/ - Create an article about artist.
 
@@ -59,7 +82,15 @@ Request body:
     }
 ```
 
-`PATCH` /artists/{artist-slug}/ - Make edits to existing artist article
+Response body:
+
+```json
+    {
+        "id": string
+    }
+```
+
+`PUT` /artists/{id}/ - Make edits to existing artist article
 
 Request body:
 
@@ -70,7 +101,7 @@ Request body:
     }
 ```
 
-`DELETE` /artists/{artist-slug}/ - Delete artist article
+`DELETE` /artists/{id}/ - Delete artist article
 
 ### Events
 
@@ -88,7 +119,32 @@ Request params:
     }
 ```
 
+Response body:
+
+```json
+    {
+        "items": { "id": string, "name": string, "date": string, "location": string }[],
+        "pagination": { "current_page": number, "total_pages": number, "total_records": number }
+    }
+```
+
 `GET` /events/{id}/ - Get specific event detailed info
+
+Response body:
+
+```json
+    {
+        "id": string,
+        "name": string,
+        "date": string,
+        "location": string,
+        "description": string,
+        "contact_info": string,
+        "creator": { "id": string, "name": string },
+        "created_at": string,
+        "updated_at": string
+    }
+```
 
 `POST` /events/ - Create new music event announcement
 
@@ -104,7 +160,15 @@ Request body:
     }
 ```
 
-`PATCH` /events/{id}/ - Make changes to event (available only for event creator)
+Response body:
+
+```json
+    {
+        "id": string
+    }
+```
+
+`PUT` /events/{id}/ - Make changes to event (available only for event creator)
 
 Request body:
 
@@ -134,8 +198,45 @@ Request params:
     }
 ```
 
+Response body:
+
+```json
+    {
+        "items": {
+            "id": string,
+            "name": string,
+            "instruments": string[],
+            "favorite_bands": string[],
+            "location": string
+        }[],
+        "pagination": { "current_page": number, "total_pages": number, "total_records": number }
+    }
+```
+
 `GET` /users/{id}/ - Get specific user profile
+
+Response body:
+
+```json
+    {
+        "id": string,
+        "name": string,
+        "instruments": string[],
+        "favorite_bands": string[],
+        "looking_for_band": boolean,
+        "location": string
+    }
+```
 
 `GET` /users/{id}/articles/ - Get user's articles
 
-`PATCH` /users/{id}/ - Make changes to user profile (only for profile owner)
+Response body:
+
+```json
+    {
+        "items": { "id": string, "artist": string, "genres": strin[] }[],
+        "pagination": { "current_page": number, "total_pages": number, "total_records": number }
+    }
+```
+
+`PUT` /users/{id}/ - Make changes to user profile (only for profile owner)
