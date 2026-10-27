@@ -103,6 +103,18 @@ Request body:
 
 `DELETE` /kmartists/artists/{id}/ - Delete artist article
 
+### Genres
+
+`GET` /kmartists/genres/ - Get all unique genres used in artist articles, sorted alphabetically. Used to build the genre filter.
+
+Response body:
+
+```json
+    {
+        "items": string[]
+    }
+```
+
 ### Events
 
 `GET` /kmartists/events/ - list events

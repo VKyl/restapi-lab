@@ -51,6 +51,14 @@ class Article(models.Model):
         return article.to_details() if article else None
 
     @classmethod
+    def all_genres(cls) -> list[str]:
+        unique_genres: dict[str, str] = {}
+        for genres in cls.objects.values_list("genres", flat=True):
+            for genre in genres:
+                unique_genres.setdefault(genre.casefold(), genre)
+        return sorted(unique_genres.values(), key=str.casefold)
+
+    @classmethod
     def artist_exists(cls, artist: str) -> bool:
         return cls.objects.filter(artist__iexact=artist).exists()
 

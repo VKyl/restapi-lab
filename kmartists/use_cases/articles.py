@@ -23,6 +23,9 @@ class ArticleUseCases:
             raise NotFoundError(f"Article {article_id} does not exist.")
         return article
 
+    def list_genres(self) -> list[str]:
+        return self._articles.all_genres()
+
     def create_article(self, article: Article) -> UUID:
         article.validate()
         if self._articles.artist_exists(article.artist):

@@ -55,6 +55,11 @@ class ArticleCollectionController(APIView):
         return Response({"id": article_id}, status=status.HTTP_201_CREATED)
 
 
+class GenreCollectionController(APIView):
+    def get(self, request: Request) -> Response:
+        return Response({"items": article_use_cases.list_genres()})
+
+
 class ArticleController(APIView):
     def get(self, request: Request, article_id: UUID) -> Response:
         return Response(article_use_cases.get_article(article_id).serialize())
