@@ -32,7 +32,7 @@ For view all the information above is available, plus articles that were written
 
 ### Artists
 
-`GET` /artists/ - Get articles about artists. Has pagination and basic filters like genre and search query
+`GET` /kmartists/artists/ - Get articles about artists. Has pagination and basic filters like genre and search query
 
 Request params:
 
@@ -54,7 +54,7 @@ Response body:
     }
 ```
 
-`GET` /artists/{id}/ - Get specific artist article.
+`GET` /kmartists/artists/{id}/ - Get specific artist article.
 
 Response body:
 
@@ -70,7 +70,7 @@ Response body:
     }
 ```
 
-`POST` /artists/ - Create an article about artist.
+`POST` /kmartists/artists/ - Create an article about artist.
 
 Request body:
 
@@ -90,7 +90,7 @@ Response body:
     }
 ```
 
-`PUT` /artists/{id}/ - Make edits to existing artist article
+`PUT` /kmartists/artists/{id}/ - Make edits to existing artist article
 
 Request body:
 
@@ -101,11 +101,11 @@ Request body:
     }
 ```
 
-`DELETE` /artists/{id}/ - Delete artist article
+`DELETE` /kmartists/artists/{id}/ - Delete artist article
 
 ### Events
 
-`GET` /events/ - list events
+`GET` /kmartists/events/ - list events
 
 Request params:
 
@@ -128,7 +128,7 @@ Response body:
     }
 ```
 
-`GET` /events/{id}/ - Get specific event detailed info
+`GET` /kmartists/events/{id}/ - Get specific event detailed info
 
 Response body:
 
@@ -146,7 +146,7 @@ Response body:
     }
 ```
 
-`POST` /events/ - Create new music event announcement
+`POST` /kmartists/events/ - Create new music event announcement
 
 Request body:
 
@@ -168,7 +168,7 @@ Response body:
     }
 ```
 
-`PUT` /events/{id}/ - Make changes to event (available only for event creator)
+`PUT` /kmartists/events/{id}/ - Make changes to event (available only for event creator)
 
 Request body:
 
@@ -182,11 +182,11 @@ Request body:
     }
 ```
 
-`DELETE` /events/{id}/ - Delete event
+`DELETE` /kmartists/events/{id}/ - Delete event
 
 ### Users
 
-`GET` /users/musicians/ - Get list of users available to play in band
+`GET` /kmartists/users/musicians/ - Get list of users available to play in band
 
 Request params:
 
@@ -213,7 +213,7 @@ Response body:
     }
 ```
 
-`GET` /users/{id}/ - Get specific user profile
+`GET` /kmartists/users/{id}/ - Get specific user profile
 
 Response body:
 
@@ -228,7 +228,7 @@ Response body:
     }
 ```
 
-`GET` /users/{id}/articles/ - Get user's articles
+`GET` /kmartists/users/{id}/articles/ - Get user's articles
 
 Response body:
 
@@ -239,7 +239,7 @@ Response body:
     }
 ```
 
-`PUT` /users/{id}/ - Make changes to user profile (only for profile owner)
+`PUT` /kmartists/users/{id}/ - Make changes to user profile (only for profile owner)
 
 ## Database diagram
 
