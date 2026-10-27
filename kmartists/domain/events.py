@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -22,16 +22,16 @@ class Event(SerializableMixin):
     description: str
     contact_info: str
 
-    def validate(self, now: datetime) -> None:
+    def validate(self) -> None:
         require_text("name", self.name, MAX_NAME_LENGTH)
-        if self.has_taken_place_by(now):
+        if self.has_taken_place():
             raise ValidationError("date", "The event date must be in the future.")
         require_text("location", self.location, MAX_LOCATION_LENGTH)
         require_text("description", self.description, MAX_DESCRIPTION_LENGTH)
         require_text("contact_info", self.contact_info, MAX_CONTACT_INFO_LENGTH)
 
-    def has_taken_place_by(self, moment: datetime) -> bool:
-        return self.date <= moment
+    def has_taken_place(self) -> bool:
+        return self.date <= datetime.now(UTC)
 
 
 @dataclass(frozen=True)

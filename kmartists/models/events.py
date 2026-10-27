@@ -1,10 +1,10 @@
 from dataclasses import asdict
+from datetime import UTC, datetime
 from datetime import date as calendar_date
 from uuid import UUID, uuid4
 
 from django.db import models
 from django.db.models import Q
-from django.utils import timezone
 
 from kmartists.domain.errors import NotFoundError
 from kmartists.domain.events import Event as EventEntity
@@ -62,7 +62,7 @@ class Event(models.Model):
 
     @classmethod
     def update_event(cls, event_id: UUID, event: EventEntity) -> None:
-        updated = cls.objects.filter(id=event_id).update(**asdict(event), updated_at=timezone.now())
+        updated = cls.objects.filter(id=event_id).update(**asdict(event), updated_at=datetime.now(UTC))
         if not updated:
             raise NotFoundError(f"Event {event_id} does not exist.")
 
