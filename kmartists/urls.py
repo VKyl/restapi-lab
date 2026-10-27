@@ -4,10 +4,10 @@ from kmartists.controllers.articles import ArticleCollectionController, ArticleC
 from kmartists.controllers.events import EventCollectionController, EventController
 
 urlpatterns = [
-    path("artists/", ArticleCollectionController.as_view(), name="article-collection"),
-    path("artists/<uuid:article_id>/", ArticleController.as_view(), name="article-detail"),
-    path("events/", EventCollectionController.as_view(), name="event-collection"),
-    path("events/<uuid:event_id>/", EventController.as_view(), name="event-detail"),
+    path("kmartists/artists/", ArticleCollectionController.as_view(), name="article-collection"),
+    path("kmartists/artists/<uuid:article_id>/", ArticleController.as_view(), name="article-detail"),
+    path("kmartists/events/", EventCollectionController.as_view(), name="event-collection"),
+    path("kmartists/events/<uuid:event_id>/", EventController.as_view(), name="event-detail"),
 ]
 
 handler404 = "kmartists.utils.error_handling.not_found"
