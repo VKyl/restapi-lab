@@ -43,6 +43,11 @@ class Article(models.Model):
         return paginate(queryset, take, skip, cls.to_summary)
 
     @classmethod
+    def list_contributed_summaries(cls, contributor_id: UUID, take: int, skip: int) -> Page[ArticleSummary]:
+        queryset = cls.objects.filter(contributors__id=contributor_id).order_by(Lower("artist"))
+        return paginate(queryset, take, skip, cls.to_summary)
+
+    @classmethod
     def find_details(cls, article_id: UUID) -> ArticleDetails | None:
         contributors = User.objects.order_by(Lower("name"))
         article = (

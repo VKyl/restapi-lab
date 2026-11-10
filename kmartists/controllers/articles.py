@@ -8,11 +8,14 @@ from rest_framework.views import APIView
 
 from kmartists import models
 from kmartists.domain.articles import Article, Section
-from kmartists.use_cases.articles import ArticleUseCases
-from kmartists.utils.authentication import authenticated_user
+from kmartists.use_cases.articles import ArticleUseCase
+from kmartists.use_cases.users import UserUseCase
+from kmartists.utils.authentication import authenticated_user_id
 from kmartists.utils.pagination import PageQuery
 
-article_use_cases = ArticleUseCases(articles=models.Article)
+article_use_case = ArticleUseCase(
+    articles=models.Article, users=UserUseCase(users=models.User, articles=models.Article)
+)
 
 
 class ListArticlesRequest(PageQuery):
@@ -46,33 +49,33 @@ class ArticleCollectionController(APIView):
     def get(self, request: Request) -> Response:
         query = ListArticlesRequest(data=request.query_params)
         query.is_valid(raise_exception=True)
-        page = article_use_cases.list_articles(**query.validated_data)
+        page = article_use_case.list_articles(**query.validated_data)
         return Response(page.serialize())
 
     def post(self, request: Request) -> Response:
-        user = authenticated_user(request)
+        user_id = authenticated_user_id(request)
         body = CreateArticleRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        article_id = article_use_cases.create_article(body.validated_data, user.id)
+        article_id = article_use_case.create_article(body.validated_data, user_id)
         return Response({"id": article_id}, status=status.HTTP_201_CREATED)
 
 
 class GenreCollectionController(APIView):
     def get(self, request: Request) -> Response:
-        return Response({"items": article_use_cases.list_genres()})
+        return Response({"items": article_use_case.list_genres()})
 
 
 class ArticleController(APIView):
     def get(self, request: Request, article_id: UUID) -> Response:
-        return Response(article_use_cases.get_article(article_id).serialize())
+        return Response(article_use_case.get_article(article_id).serialize())
 
     def put(self, request: Request, article_id: UUID) -> Response:
-        user = authenticated_user(request)
+        user_id = authenticated_user_id(request)
         body = UpdateArticleRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        article_use_cases.edit_article(article_id, user.id, **body.validated_data)
+        article_use_case.edit_article(article_id, user_id, **body.validated_data)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request: Request, article_id: UUID) -> Response:
-        article_use_cases.delete_article(article_id, authenticated_user(request).id)
+        article_use_case.delete_article(article_id, authenticated_user_id(request))
         return Response(status=status.HTTP_204_NO_CONTENT)

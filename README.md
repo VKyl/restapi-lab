@@ -302,7 +302,7 @@ Request params:
     {
         "take": number,
         "skip": number,
-        "location": string,
+        "location": string
     }
 ```
 
@@ -338,16 +338,37 @@ Response body:
 
 `GET` /kmartists/users/{id}/articles/ - Get user's articles
 
+Request params:
+
+```json
+    {
+        "take": number,
+        "skip": number
+    }
+```
+
 Response body:
 
 ```json
     {
-        "items": { "id": string, "artist": string, "genres": strin[] }[],
+        "items": { "id": string, "artist": string, "genres": string[] }[],
         "pagination": { "current_page": number, "total_pages": number, "total_records": number }
     }
 ```
 
 `PUT` /kmartists/users/{id}/ - Make changes to user profile (only for profile owner)
+
+Request body:
+
+```json
+    {
+        "name": string,
+        "instruments": string[],
+        "favorite_bands": string[],
+        "looking_for_band": boolean,
+        "location": string
+    }
+```
 
 ## Database diagram
 

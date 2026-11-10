@@ -2,19 +2,26 @@ from uuid import UUID, uuid4
 
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import IntegrityError, models
+from django.db.models.functions import Lower
 
-from kmartists.domain.errors import ConflictError
+from kmartists.domain.errors import ConflictError, NotFoundError
 from kmartists.domain.users import (
     MAX_EMAIL_LENGTH,
     MAX_FIRST_NAME_LENGTH,
     MAX_LAST_NAME_LENGTH,
+    MAX_LOCATION_LENGTH,
     MAX_MICROSOFT_ID_LENGTH,
     MAX_USERNAME_LENGTH,
     MicrosoftRegistration,
+    MusicianSummary,
     PasswordRegistration,
+    Profile,
+    ProfileDetails,
     UserIdentity,
     UserReference,
 )
+from kmartists.utils.pagination import Page, paginate
+
 
 class User(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -25,12 +32,39 @@ class User(models.Model):
     password = models.CharField(max_length=128, blank=True)
     microsoft_id = models.CharField(max_length=MAX_MICROSOFT_ID_LENGTH, unique=True, null=True)
     looking_for_band = models.BooleanField(default=False)
-    location = models.CharField(max_length=200, blank=True)
+    location = models.CharField(max_length=MAX_LOCATION_LENGTH, blank=True)
     instruments = models.JSONField(default=list)
     favorite_bands = models.JSONField(default=list)
 
     class Meta:
         db_table = "users"
+
+    @classmethod
+    def list_musicians(cls, take: int, skip: int, location: str | None) -> Page[MusicianSummary]:
+        queryset = cls.objects.filter(looking_for_band=True).order_by(Lower("name"))
+        if location:
+            queryset = queryset.filter(location__icontains=location)
+        return paginate(queryset, take, skip, cls.to_musician)
+
+    @classmethod
+    def find_profile(cls, user_id: UUID) -> ProfileDetails | None:
+        user = cls.objects.filter(id=user_id).first()
+        return user.to_profile() if user else None
+
+    @classmethod
+    def update_profile(cls, user_id: UUID, profile: Profile) -> None:
+        try:
+            updated = cls.objects.filter(id=user_id).update(
+                name=profile.name,
+                instruments=list(profile.instruments),
+                favorite_bands=list(profile.favorite_bands),
+                looking_for_band=profile.looking_for_band,
+                location=profile.location,
+            )
+        except IntegrityError as error:
+            raise ConflictError(f"Username {profile.name} is already taken.") from error
+        if not updated:
+            raise NotFoundError(f"User {user_id} does not exist.")
 
     @classmethod
     def username_exists(cls, username: str) -> bool:
@@ -93,3 +127,22 @@ class User(models.Model):
 
     def to_identity(self) -> UserIdentity:
         return UserIdentity(id=self.id, username=self.name, first_name=self.first_name, last_name=self.last_name)
+
+    def to_musician(self) -> MusicianSummary:
+        return MusicianSummary(
+            id=self.id,
+            name=self.name,
+            instruments=tuple(self.instruments),
+            favorite_bands=tuple(self.favorite_bands),
+            location=self.location,
+        )
+
+    def to_profile(self) -> ProfileDetails:
+        return ProfileDetails(
+            id=self.id,
+            name=self.name,
+            instruments=tuple(self.instruments),
+            favorite_bands=tuple(self.favorite_bands),
+            looking_for_band=self.looking_for_band,
+            location=self.location,
+        )

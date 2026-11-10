@@ -2,7 +2,14 @@ from django.urls import path
 
 from kmartists.controllers.articles import ArticleCollectionController, ArticleController, GenreCollectionController
 from kmartists.controllers.events import EventCollectionController, EventController
-from kmartists.controllers.users import LoginController, RefreshController, RegisterController
+from kmartists.controllers.users import (
+    LoginController,
+    MusicianCollectionController,
+    RefreshController,
+    RegisterController,
+    UserArticleCollectionController,
+    UserController,
+)
 
 urlpatterns = [
     path("kmartists/artists/", ArticleCollectionController.as_view(), name="article-collection"),
@@ -13,6 +20,9 @@ urlpatterns = [
     path("kmartists/register/", RegisterController.as_view(), name="register"),
     path("kmartists/login/", LoginController.as_view(), name="login"),
     path("kmartists/refresh/", RefreshController.as_view(), name="refresh"),
+    path("kmartists/users/musicians/", MusicianCollectionController.as_view(), name="musician-collection"),
+    path("kmartists/users/<uuid:user_id>/", UserController.as_view(), name="user-detail"),
+    path("kmartists/users/<uuid:user_id>/articles/", UserArticleCollectionController.as_view(), name="user-articles"),
 ]
 
 handler404 = "kmartists.utils.error_handling.not_found"

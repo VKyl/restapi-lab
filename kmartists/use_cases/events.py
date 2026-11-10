@@ -4,12 +4,14 @@ from uuid import UUID
 from kmartists.domain.errors import ConflictError, ForbiddenError, NotFoundError
 from kmartists.domain.events import Event, EventDetails, EventSummary
 from kmartists.interfaces.events import EventRepository
+from kmartists.use_cases.users import UserUseCase
 from kmartists.utils.pagination import Page
 
 
-class EventUseCases:
-    def __init__(self, events: EventRepository) -> None:
+class EventUseCase:
+    def __init__(self, events: EventRepository, users: UserUseCase) -> None:
         self._events = events
+        self._users = users
 
     def list_events(
         self,
@@ -28,6 +30,7 @@ class EventUseCases:
         return event
 
     def create_event(self, event: Event, creator_id: UUID) -> UUID:
+        self._users.get_identity(creator_id)
         event.validate()
         return self._events.create_event(event, creator_id)
 

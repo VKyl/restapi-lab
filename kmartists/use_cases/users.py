@@ -1,13 +1,47 @@
 from uuid import UUID
 
-from kmartists.domain.errors import AuthenticationError, ConflictError, NotFoundError
-from kmartists.domain.users import MicrosoftRegistration, PasswordRegistration, Registration, UserIdentity
+from kmartists.domain.articles import ArticleSummary
+from kmartists.domain.errors import AuthenticationError, ConflictError, ForbiddenError, NotFoundError
+from kmartists.domain.users import (
+    MicrosoftRegistration,
+    MusicianSummary,
+    PasswordRegistration,
+    Profile,
+    ProfileDetails,
+    Registration,
+    UserIdentity,
+)
+from kmartists.interfaces.articles import ArticleRepository
 from kmartists.interfaces.users import UserRepository
+from kmartists.utils.pagination import Page
 
 
-class UserUseCases:
-    def __init__(self, users: UserRepository) -> None:
+class UserUseCase:
+    def __init__(self, users: UserRepository, articles: ArticleRepository) -> None:
         self._users = users
+        self._articles = articles
+
+    def list_musicians(self, take: int, skip: int, location: str | None) -> Page[MusicianSummary]:
+        return self._users.list_musicians(take, skip, location)
+
+    def get_profile(self, user_id: UUID) -> ProfileDetails:
+        profile = self._users.find_profile(user_id)
+        if profile is None:
+            raise NotFoundError(f"User {user_id} does not exist.")
+        return profile
+
+    def list_user_articles(self, user_id: UUID, take: int, skip: int) -> Page[ArticleSummary]:
+        self.get_profile(user_id)
+        return self._articles.list_contributed_summaries(user_id, take, skip)
+
+    def update_profile(self, user_id: UUID, profile: Profile, requester_id: UUID) -> None:
+        if user_id != requester_id:
+            raise ForbiddenError("Only the profile owner can change this profile.")
+        current = self.get_profile(user_id)
+        profile.validate()
+        if profile.name.casefold() != current.name.casefold() and self._users.username_exists(profile.name):
+            raise ConflictError(f"Username {profile.name} is already taken.")
+        self._users.update_profile(user_id, profile)
 
     def register(self, registration: PasswordRegistration) -> UserIdentity:
         self._ensure_can_register(registration)
