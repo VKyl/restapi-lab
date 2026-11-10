@@ -28,9 +28,9 @@ def read_microsoft_token(token: str) -> MicrosoftIdentity:
             options={"require": ["sub", "tid", "iss", "aud", "exp"]},
         )
     except jwt.PyJWTError as error:
-        raise AuthenticationError("Microsoft token is invalid or expired.") from error
+        raise AuthenticationError(f"Microsoft token is invalid: {error}") from error
     if payload["iss"] != MICROSOFT_ISSUER.format(tenant_id=payload["tid"]):
-        raise AuthenticationError("Microsoft token is invalid or expired.")
+        raise AuthenticationError("Microsoft token is invalid: Invalid issuer")
     email = payload.get("email") or payload.get("preferred_username")
     if not email:
         raise AuthenticationError("Microsoft account has no email address.")
