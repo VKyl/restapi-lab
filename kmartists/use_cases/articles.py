@@ -3,7 +3,7 @@ from dataclasses import replace
 from uuid import UUID
 
 from kmartists.domain.articles import Article, ArticleDetails, ArticleSummary, Section
-from kmartists.domain.errors import ConflictError, NotFoundError
+from kmartists.domain.errors import ConflictError, ForbiddenError, NotFoundError
 from kmartists.interfaces.articles import ArticleRepository
 from kmartists.utils.pagination import Page
 
@@ -26,17 +26,21 @@ class ArticleUseCases:
     def list_genres(self) -> list[str]:
         return self._articles.all_genres()
 
-    def create_article(self, article: Article) -> UUID:
+    def create_article(self, article: Article, author_id: UUID) -> UUID:
         article.validate()
         if self._articles.artist_exists(article.artist):
             raise ConflictError(f"An article about {article.artist} already exists.")
-        return self._articles.create_article(article)
+        return self._articles.create_article(article, author_id)
 
-    def edit_article(self, article_id: UUID, genres: Sequence[str], body: Sequence[Section]) -> None:
+    def edit_article(
+        self, article_id: UUID, contributor_id: UUID, genres: Sequence[str], body: Sequence[Section]
+    ) -> None:
         article = replace(self.get_article(article_id), genres=genres, body=body)
         article.validate()
-        self._articles.update_article(article_id, article)
+        self._articles.update_article(article_id, article, contributor_id)
 
-    def delete_article(self, article_id: UUID) -> None:
-        self.get_article(article_id)
+    def delete_article(self, article_id: UUID, user_id: UUID) -> None:
+        article = self.get_article(article_id)
+        if all(contributor.id != user_id for contributor in article.contributors):
+            raise ForbiddenError("Only article contributors can delete this article.")
         self._articles.delete_article(article_id)

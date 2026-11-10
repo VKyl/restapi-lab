@@ -47,6 +47,9 @@ class RefreshRequest(serializers.Serializer):
 
 
 class RegisterController(APIView):
+    authentication_classes = []
+    permission_classes = []
+
     def post(self, request: Request) -> Response:
         if "microsoft_token" in request.data:
             user = self._register_with_microsoft(request)
@@ -66,6 +69,9 @@ class RegisterController(APIView):
 
 
 class LoginController(APIView):
+    authentication_classes = []
+    permission_classes = []
+
     def post(self, request: Request) -> Response:
         if "microsoft_token" in request.data:
             user = self._log_in_with_microsoft(request)
@@ -83,8 +89,11 @@ class LoginController(APIView):
 
 
 class RefreshController(APIView):
+    authentication_classes = []
+    permission_classes = []
+
     def post(self, request: Request) -> Response:
         body = RefreshRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        user = user_use_cases.refresh(read_refresh_token(body.validated_data["refresh_token"]))
+        user = user_use_cases.get_identity(read_refresh_token(body.validated_data["refresh_token"]))
         return Response(issue_tokens(user).serialize())

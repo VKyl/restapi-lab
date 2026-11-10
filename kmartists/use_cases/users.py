@@ -31,7 +31,7 @@ class UserUseCases:
             raise NotFoundError("No user is registered with this Microsoft account.")
         return user
 
-    def refresh(self, user_id: UUID) -> UserIdentity:
+    def get_identity(self, user_id: UUID) -> UserIdentity:
         user = self._users.find_identity(user_id)
         if user is None:
             raise AuthenticationError("User no longer exists.")

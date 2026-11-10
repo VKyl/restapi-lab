@@ -41,7 +41,7 @@ class EventCollectionController(APIView):
     def post(self, request: Request) -> Response:
         body = SaveEventRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        event_id = event_use_cases.create_event(body.validated_data)
+        event_id = event_use_cases.create_event(body.validated_data, request.user.id)
         return Response({"id": event_id}, status=status.HTTP_201_CREATED)
 
 
@@ -52,9 +52,9 @@ class EventController(APIView):
     def put(self, request: Request, event_id: UUID) -> Response:
         body = SaveEventRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        event_use_cases.update_event(event_id, body.validated_data)
+        event_use_cases.update_event(event_id, body.validated_data, request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request: Request, event_id: UUID) -> Response:
-        event_use_cases.delete_event(event_id)
+        event_use_cases.delete_event(event_id, request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)

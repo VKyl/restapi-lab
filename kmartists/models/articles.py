@@ -63,7 +63,7 @@ class Article(models.Model):
         return cls.objects.filter(artist__iexact=artist).exists()
 
     @classmethod
-    def create_article(cls, article: ArticleEntity) -> UUID:
+    def create_article(cls, article: ArticleEntity, author_id: UUID) -> UUID:
         try:
             record = cls.objects.create(
                 artist=article.artist,
@@ -72,18 +72,18 @@ class Article(models.Model):
             )
         except IntegrityError as error:
             raise ConflictError(f"An article about {article.artist} already exists.") from error
-        record.contributors.add(User.placeholder_author())
+        record.contributors.add(author_id)
         return record.id
 
     @classmethod
-    def update_article(cls, article_id: UUID, article: ArticleEntity) -> None:
+    def update_article(cls, article_id: UUID, article: ArticleEntity, contributor_id: UUID) -> None:
         record = cls.objects.filter(id=article_id).first()
         if record is None:
             raise NotFoundError(f"Article {article_id} does not exist.")
         record.genres = list(article.genres)
         record.body = serialize_body(article.body)
         record.save()
-        record.contributors.add(User.placeholder_author())
+        record.contributors.add(contributor_id)
 
     @classmethod
     def delete_article(cls, article_id: UUID) -> None:

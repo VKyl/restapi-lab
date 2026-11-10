@@ -30,6 +30,16 @@ For view all the information above is available, plus articles that were written
 
 ## Core Endpoints
 
+### Authentication
+
+`GET` endpoints are public. `POST`, `PUT` and `DELETE` endpoints require the access token from register, login or refresh:
+
+```text
+Authorization: Bearer <token>
+```
+
+Missing, invalid or expired token returns `401`. Only the event creator can change or delete an event, and only article contributors can delete an article; otherwise `403`. Creating or editing an article adds the user to its contributors.
+
 ### Artists
 
 `GET` /kmartists/artists/ - Get articles about artists. Has pagination and basic filters like genre and search query

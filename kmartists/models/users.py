@@ -16,9 +16,6 @@ from kmartists.domain.users import (
     UserReference,
 )
 
-PLACEHOLDER_AUTHOR_NAME = "guest"
-
-
 class User(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=MAX_USERNAME_LENGTH, unique=True)
@@ -34,10 +31,6 @@ class User(models.Model):
 
     class Meta:
         db_table = "users"
-
-    @classmethod
-    def placeholder_author(cls) -> "User":
-        return cls.objects.get(name=PLACEHOLDER_AUTHOR_NAME)
 
     @classmethod
     def username_exists(cls, username: str) -> bool:

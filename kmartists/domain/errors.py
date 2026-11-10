@@ -22,5 +22,9 @@ class ConflictError(DomainError):
     code = "conflict"
 
 
+class ForbiddenError(DomainError):
+    code = "forbidden"
+
+
 class AuthenticationError(DomainError):
     code = "invalid_credentials"

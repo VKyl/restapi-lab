@@ -51,7 +51,7 @@ class ArticleCollectionController(APIView):
     def post(self, request: Request) -> Response:
         body = CreateArticleRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        article_id = article_use_cases.create_article(body.validated_data)
+        article_id = article_use_cases.create_article(body.validated_data, request.user.id)
         return Response({"id": article_id}, status=status.HTTP_201_CREATED)
 
 
@@ -67,9 +67,9 @@ class ArticleController(APIView):
     def put(self, request: Request, article_id: UUID) -> Response:
         body = UpdateArticleRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        article_use_cases.edit_article(article_id, **body.validated_data)
+        article_use_cases.edit_article(article_id, request.user.id, **body.validated_data)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request: Request, article_id: UUID) -> Response:
-        article_use_cases.delete_article(article_id)
+        article_use_cases.delete_article(article_id, request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
