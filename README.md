@@ -295,7 +295,7 @@ Auth endpoints return JWTs signed with HS256 and payload `{ "id": string, "usern
 
 ### Users
 
-`GET` /kmartists/users/musicians/ - Get list of users available to play in band
+`GET` /kmartists/users/musicians/ - Get list of users available to play in band. When the request carries an access token, the requesting user is not included
 
 Request params:
 

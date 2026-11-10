@@ -40,8 +40,12 @@ class User(models.Model):
         db_table = "users"
 
     @classmethod
-    def list_musicians(cls, take: int, skip: int, location: str | None) -> Page[MusicianSummary]:
+    def list_musicians(
+        cls, take: int, skip: int, location: str | None, excluded_user_id: UUID | None
+    ) -> Page[MusicianSummary]:
         queryset = cls.objects.filter(looking_for_band=True).order_by(Lower("name"))
+        if excluded_user_id:
+            queryset = queryset.exclude(id=excluded_user_id)
         if location:
             queryset = queryset.filter(location__icontains=location)
         return paginate(queryset, take, skip, cls.to_musician)

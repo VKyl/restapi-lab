@@ -21,8 +21,10 @@ class UserUseCase:
         self._users = users
         self._articles = articles
 
-    def list_musicians(self, take: int, skip: int, location: str | None) -> Page[MusicianSummary]:
-        return self._users.list_musicians(take, skip, location)
+    def list_musicians(
+        self, take: int, skip: int, location: str | None, requester_id: UUID | None
+    ) -> Page[MusicianSummary]:
+        return self._users.list_musicians(take, skip, location, requester_id)
 
     def get_profile(self, user_id: UUID) -> ProfileDetails:
         profile = self._users.find_profile(user_id)

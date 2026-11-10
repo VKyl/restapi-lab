@@ -10,9 +10,16 @@ AUTHORIZATION_SCHEME = "Bearer"
 
 
 def authenticated_user_id(request: Request) -> UUID:
+    user_id = optional_user_id(request)
+    if user_id is None:
+        raise AuthenticationError("Authentication credentials were not provided.")
+    return user_id
+
+
+def optional_user_id(request: Request) -> UUID | None:
     header = get_authorization_header(request).decode()
     if not header:
-        raise AuthenticationError("Authentication credentials were not provided.")
+        return None
     scheme, _, token = header.partition(" ")
     if scheme != AUTHORIZATION_SCHEME or not token:
         raise AuthenticationError(f"Authorization header must look like: {AUTHORIZATION_SCHEME} <token>.")

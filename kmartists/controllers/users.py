@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from kmartists import models
 from kmartists.domain.users import MicrosoftRegistration, PasswordRegistration, Profile, UserIdentity
 from kmartists.use_cases.users import UserUseCase
-from kmartists.utils.authentication import authenticated_user_id
+from kmartists.utils.authentication import authenticated_user_id, optional_user_id
 from kmartists.utils.microsoft import read_microsoft_token
 from kmartists.utils.pagination import PageQuery
 from kmartists.utils.tokens import issue_tokens, read_refresh_token
@@ -112,7 +112,7 @@ class MusicianCollectionController(APIView):
     def get(self, request: Request) -> Response:
         query = ListMusiciansRequest(data=request.query_params)
         query.is_valid(raise_exception=True)
-        page = user_use_case.list_musicians(**query.validated_data)
+        page = user_use_case.list_musicians(**query.validated_data, requester_id=optional_user_id(request))
         return Response(page.serialize())
 
 

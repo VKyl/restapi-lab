@@ -13,7 +13,9 @@ from kmartists.utils.pagination import Page
 
 
 class UserRepository(Protocol):
-    def list_musicians(self, take: int, skip: int, location: str | None) -> Page[MusicianSummary]: ...
+    def list_musicians(
+        self, take: int, skip: int, location: str | None, excluded_user_id: UUID | None
+    ) -> Page[MusicianSummary]: ...
 
     def find_profile(self, user_id: UUID) -> ProfileDetails | None: ...
 
