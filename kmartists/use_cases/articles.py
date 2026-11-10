@@ -45,6 +45,6 @@ class ArticleUseCase:
 
     def delete_article(self, article_id: UUID, user_id: UUID) -> None:
         article = self.get_article(article_id)
-        if all(contributor.id != user_id for contributor in article.contributors):
-            raise ForbiddenError("Only article contributors can delete this article.")
+        if article.author is None or article.author.id != user_id:
+            raise ForbiddenError("Only the article author can delete this article.")
         self._articles.delete_article(article_id)

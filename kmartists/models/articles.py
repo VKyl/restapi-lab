@@ -19,6 +19,7 @@ class Article(models.Model):
     artist = models.CharField(max_length=MAX_ARTIST_LENGTH)
     genres = models.JSONField(default=list)
     body = models.JSONField(default=list)
+    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="authored_articles")
     contributors = models.ManyToManyField(User, related_name="articles", db_table="user_article")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -51,7 +52,10 @@ class Article(models.Model):
     def find_details(cls, article_id: UUID) -> ArticleDetails | None:
         contributors = User.objects.order_by(Lower("name"))
         article = (
-            cls.objects.prefetch_related(Prefetch("contributors", queryset=contributors)).filter(id=article_id).first()
+            cls.objects.select_related("author")
+            .prefetch_related(Prefetch("contributors", queryset=contributors))
+            .filter(id=article_id)
+            .first()
         )
         return article.to_details() if article else None
 
@@ -71,6 +75,7 @@ class Article(models.Model):
     def create_article(cls, article: ArticleEntity, author_id: UUID) -> UUID:
         try:
             record = cls.objects.create(
+                author_id=author_id,
                 artist=article.artist,
                 genres=list(article.genres),
                 body=serialize_body(article.body),
@@ -103,6 +108,7 @@ class Article(models.Model):
             artist=self.artist,
             genres=tuple(self.genres),
             body=tuple(Section(**section) for section in self.body),
+            author=self.author.to_reference() if self.author else None,
             contributors=tuple(contributor.to_reference() for contributor in self.contributors.all()),
             created_at=self.created_at,
             updated_at=self.updated_at,
