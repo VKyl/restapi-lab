@@ -57,8 +57,8 @@ class Event(models.Model):
         return event.to_details() if event else None
 
     @classmethod
-    def create_event(cls, event: EventEntity) -> UUID:
-        return cls.objects.create(creator=User.placeholder_author(), **asdict(event)).id
+    def create_event(cls, event: EventEntity, creator_id: UUID) -> UUID:
+        return cls.objects.create(creator_id=creator_id, **asdict(event)).id
 
     @classmethod
     def update_event(cls, event_id: UUID, event: EventEntity) -> None:

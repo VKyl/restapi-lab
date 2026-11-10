@@ -1,0 +1,38 @@
+from typing import Protocol
+from uuid import UUID
+
+from kmartists.domain.users import (
+    MicrosoftRegistration,
+    MusicianSummary,
+    PasswordRegistration,
+    Profile,
+    ProfileDetails,
+    UserIdentity,
+)
+from kmartists.utils.pagination import Page
+
+
+class UserRepository(Protocol):
+    def list_musicians(
+        self, take: int, skip: int, location: str | None, excluded_user_id: UUID | None
+    ) -> Page[MusicianSummary]: ...
+
+    def find_profile(self, user_id: UUID) -> ProfileDetails | None: ...
+
+    def update_profile(self, user_id: UUID, profile: Profile) -> None: ...
+
+    def username_exists(self, username: str) -> bool: ...
+
+    def email_exists(self, email: str) -> bool: ...
+
+    def microsoft_account_exists(self, microsoft_id: str) -> bool: ...
+
+    def create_user(self, registration: PasswordRegistration) -> UserIdentity: ...
+
+    def create_microsoft_user(self, registration: MicrosoftRegistration) -> UserIdentity: ...
+
+    def authenticate(self, login: str, password: str) -> UserIdentity | None: ...
+
+    def find_identity(self, user_id: UUID) -> UserIdentity | None: ...
+
+    def find_microsoft_identity(self, microsoft_id: str) -> UserIdentity | None: ...

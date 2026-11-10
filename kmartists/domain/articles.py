@@ -66,6 +66,7 @@ class ArticleSummary(SerializableMixin):
 @dataclass(frozen=True)
 class ArticleDetails(Article):
     id: UUID
+    author: UserReference | None
     contributors: Sequence[UserReference]
     created_at: datetime
     updated_at: datetime
