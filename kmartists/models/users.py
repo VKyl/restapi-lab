@@ -8,8 +8,10 @@ from kmartists.domain.users import (
     MAX_EMAIL_LENGTH,
     MAX_FIRST_NAME_LENGTH,
     MAX_LAST_NAME_LENGTH,
+    MAX_MICROSOFT_ID_LENGTH,
     MAX_USERNAME_LENGTH,
-    Registration,
+    MicrosoftRegistration,
+    PasswordRegistration,
     UserReference,
 )
 
@@ -23,6 +25,7 @@ class User(models.Model):
     last_name = models.CharField(max_length=MAX_LAST_NAME_LENGTH, blank=True)
     email = models.EmailField(max_length=MAX_EMAIL_LENGTH, unique=True, null=True)
     password = models.CharField(max_length=128, blank=True)
+    microsoft_id = models.CharField(max_length=MAX_MICROSOFT_ID_LENGTH, unique=True, null=True)
     looking_for_band = models.BooleanField(default=False)
     location = models.CharField(max_length=200, blank=True)
     instruments = models.JSONField(default=list)
@@ -44,7 +47,11 @@ class User(models.Model):
         return cls.objects.filter(email__iexact=email).exists()
 
     @classmethod
-    def create_user(cls, registration: Registration) -> UserReference:
+    def microsoft_account_exists(cls, microsoft_id: str) -> bool:
+        return cls.objects.filter(microsoft_id=microsoft_id).exists()
+
+    @classmethod
+    def create_user(cls, registration: PasswordRegistration) -> UserReference:
         try:
             record = cls.objects.create(
                 name=registration.username,
@@ -55,6 +62,20 @@ class User(models.Model):
             )
         except IntegrityError as error:
             raise ConflictError("A user with this username or email already exists.") from error
+        return record.to_reference()
+
+    @classmethod
+    def create_microsoft_user(cls, registration: MicrosoftRegistration) -> UserReference:
+        try:
+            record = cls.objects.create(
+                name=registration.username,
+                first_name=registration.first_name,
+                last_name=registration.last_name,
+                email=registration.email,
+                microsoft_id=registration.microsoft_id,
+            )
+        except IntegrityError as error:
+            raise ConflictError("A user with this username, email or Microsoft account already exists.") from error
         return record.to_reference()
 
     @classmethod

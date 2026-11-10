@@ -1,7 +1,7 @@
 from typing import Protocol
 from uuid import UUID
 
-from kmartists.domain.users import Registration, UserReference
+from kmartists.domain.users import MicrosoftRegistration, PasswordRegistration, UserReference
 
 
 class UserRepository(Protocol):
@@ -9,7 +9,11 @@ class UserRepository(Protocol):
 
     def email_exists(self, email: str) -> bool: ...
 
-    def create_user(self, registration: Registration) -> UserReference: ...
+    def microsoft_account_exists(self, microsoft_id: str) -> bool: ...
+
+    def create_user(self, registration: PasswordRegistration) -> UserReference: ...
+
+    def create_microsoft_user(self, registration: MicrosoftRegistration) -> UserReference: ...
 
     def authenticate(self, username: str, password: str) -> UserReference | None: ...
 

@@ -213,6 +213,17 @@ Request body:
     }
 ```
 
+Request body for users signing up with Microsoft. `microsoft_token` is the ID token issued by Microsoft for this app (`MICROSOFT_CLIENT_ID`); email is taken from the token, password is not needed.
+
+```json
+    {
+        "username": string,
+        "first_name": string,
+        "last_name": string,
+        "microsoft_token": string
+    }
+```
+
 Response body:
 
 ```json

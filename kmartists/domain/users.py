@@ -10,6 +10,7 @@ MAX_LAST_NAME_LENGTH = 100
 MAX_EMAIL_LENGTH = 254
 MIN_PASSWORD_LENGTH = 8
 MAX_PASSWORD_LENGTH = 128
+MAX_MICROSOFT_ID_LENGTH = 255
 
 
 @dataclass(frozen=True)
@@ -24,8 +25,6 @@ class Registration:
     first_name: str
     last_name: str
     email: str
-    password: str
-    password_confirmation: str
 
     def validate(self) -> None:
         require_text("username", self.username, MAX_USERNAME_LENGTH)
@@ -34,6 +33,15 @@ class Registration:
         require_text("email", self.email, MAX_EMAIL_LENGTH)
         if not is_email(self.email):
             raise ValidationError("email", "Enter a valid email address, e.g. name@example.com.")
+
+
+@dataclass(frozen=True)
+class PasswordRegistration(Registration):
+    password: str
+    password_confirmation: str
+
+    def validate(self) -> None:
+        super().validate()
         self._validate_password()
 
     def _validate_password(self) -> None:
@@ -48,3 +56,8 @@ class Registration:
             raise ValidationError("password", "Password must contain at least one digit.")
         if self.password != self.password_confirmation:
             raise ValidationError("password_confirmation", "Passwords do not match.")
+
+
+@dataclass(frozen=True)
+class MicrosoftRegistration(Registration):
+    microsoft_id: str
