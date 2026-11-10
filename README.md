@@ -196,6 +196,73 @@ Request body:
 
 `DELETE` /kmartists/events/{id}/ - Delete event
 
+### Auth
+
+`POST` /kmartists/register/ - Register a new user. `first_name` and `last_name` are optional. Password must be at least 8 characters long and contain a lowercase letter, an uppercase letter and a digit.
+
+Request body:
+
+```json
+    {
+        "username": string,
+        "first_name": string,
+        "last_name": string,
+        "email": string,
+        "password": string,
+        "password_confirmation": string
+    }
+```
+
+Response body:
+
+```json
+    {
+        "token": string,
+        "refresh_token": string
+    }
+```
+
+`POST` /kmartists/login/ - Log in with username and password
+
+Request body:
+
+```json
+    {
+        "username": string,
+        "password": string
+    }
+```
+
+Response body:
+
+```json
+    {
+        "token": string,
+        "refresh_token": string
+    }
+```
+
+`POST` /kmartists/refresh/ - Exchange a refresh token for a new pair of tokens
+
+Request body:
+
+```json
+    {
+        "refresh_token": string
+    }
+```
+
+Response body:
+
+```json
+    {
+        "token": string,
+        "refresh_token": string
+    }
+```
+
+Auth endpoints return JWTs signed with HS256 and payload `{ "sub": user id, "username": string, "type": "access" | "refresh", "iat": number, "exp": number }`. `token` is valid for 15 minutes, `refresh_token` for 7 days.
+
 ### Users
 
 `GET` /kmartists/users/musicians/ - Get list of users available to play in band

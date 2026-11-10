@@ -5,10 +5,11 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
-from kmartists.domain.errors import ConflictError, DomainError, NotFoundError, ValidationError
+from kmartists.domain.errors import AuthenticationError, ConflictError, DomainError, NotFoundError, ValidationError
 
 STATUS_BY_ERROR_TYPE: dict[type[DomainError], int] = {
     ValidationError: status.HTTP_400_BAD_REQUEST,
+    AuthenticationError: status.HTTP_401_UNAUTHORIZED,
     NotFoundError: status.HTTP_404_NOT_FOUND,
     ConflictError: status.HTTP_409_CONFLICT,
     DomainError: status.HTTP_400_BAD_REQUEST,

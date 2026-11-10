@@ -20,3 +20,7 @@ class NotFoundError(DomainError):
 
 class ConflictError(DomainError):
     code = "conflict"
+
+
+class AuthenticationError(DomainError):
+    code = "invalid_credentials"

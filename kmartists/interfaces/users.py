@@ -1,0 +1,16 @@
+from typing import Protocol
+from uuid import UUID
+
+from kmartists.domain.users import Registration, UserReference
+
+
+class UserRepository(Protocol):
+    def username_exists(self, username: str) -> bool: ...
+
+    def email_exists(self, email: str) -> bool: ...
+
+    def create_user(self, registration: Registration) -> UserReference: ...
+
+    def authenticate(self, username: str, password: str) -> UserReference | None: ...
+
+    def find_reference(self, user_id: UUID) -> UserReference | None: ...
