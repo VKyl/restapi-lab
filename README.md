@@ -38,7 +38,7 @@ For view all the information above is available, plus articles that were written
 Authorization: Bearer <token>
 ```
 
-Missing, invalid or expired token returns `401`. Only the event creator can change or delete an event, and only article contributors can delete an article; otherwise `403`. Creating or editing an article adds the user to its contributors.
+Missing, invalid or expired token returns `401`. Only the event creator can change or delete an event, and only the article author can delete an article; otherwise `403`. Creating or editing an article adds the user to its contributors.
 
 ### Artists
 
@@ -74,6 +74,7 @@ Response body:
         "artist": string,
         "genres": string[],
         "body": { "title": string, "content": string }[],
+        "author": { "id": string, "name": string } | null,
         "contributors": { "id": string, "name": string }[],
         "created_at": string,
         "updated_at": string
