@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from kmartists import models
 from kmartists.domain.articles import Article, Section
 from kmartists.use_cases.articles import ArticleUseCases
+from kmartists.utils.authentication import authenticated_user
 from kmartists.utils.pagination import PageQuery
 
 article_use_cases = ArticleUseCases(articles=models.Article)
@@ -49,9 +50,10 @@ class ArticleCollectionController(APIView):
         return Response(page.serialize())
 
     def post(self, request: Request) -> Response:
+        user = authenticated_user(request)
         body = CreateArticleRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        article_id = article_use_cases.create_article(body.validated_data, request.user.id)
+        article_id = article_use_cases.create_article(body.validated_data, user.id)
         return Response({"id": article_id}, status=status.HTTP_201_CREATED)
 
 
@@ -65,11 +67,12 @@ class ArticleController(APIView):
         return Response(article_use_cases.get_article(article_id).serialize())
 
     def put(self, request: Request, article_id: UUID) -> Response:
+        user = authenticated_user(request)
         body = UpdateArticleRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        article_use_cases.edit_article(article_id, request.user.id, **body.validated_data)
+        article_use_cases.edit_article(article_id, user.id, **body.validated_data)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request: Request, article_id: UUID) -> Response:
-        article_use_cases.delete_article(article_id, request.user.id)
+        article_use_cases.delete_article(article_id, authenticated_user(request).id)
         return Response(status=status.HTTP_204_NO_CONTENT)

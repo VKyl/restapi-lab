@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from kmartists import models
 from kmartists.domain.events import Event
 from kmartists.use_cases.events import EventUseCases
+from kmartists.utils.authentication import authenticated_user
 from kmartists.utils.pagination import PageQuery
 
 event_use_cases = EventUseCases(events=models.Event)
@@ -39,9 +40,10 @@ class EventCollectionController(APIView):
         return Response(page.serialize())
 
     def post(self, request: Request) -> Response:
+        user = authenticated_user(request)
         body = SaveEventRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        event_id = event_use_cases.create_event(body.validated_data, request.user.id)
+        event_id = event_use_cases.create_event(body.validated_data, user.id)
         return Response({"id": event_id}, status=status.HTTP_201_CREATED)
 
 
@@ -50,11 +52,12 @@ class EventController(APIView):
         return Response(event_use_cases.get_event(event_id).serialize())
 
     def put(self, request: Request, event_id: UUID) -> Response:
+        user = authenticated_user(request)
         body = SaveEventRequest(data=request.data)
         body.is_valid(raise_exception=True)
-        event_use_cases.update_event(event_id, body.validated_data, request.user.id)
+        event_use_cases.update_event(event_id, body.validated_data, user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request: Request, event_id: UUID) -> Response:
-        event_use_cases.delete_event(event_id, request.user.id)
+        event_use_cases.delete_event(event_id, authenticated_user(request).id)
         return Response(status=status.HTTP_204_NO_CONTENT)
