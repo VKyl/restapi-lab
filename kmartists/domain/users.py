@@ -20,6 +20,14 @@ class UserReference:
 
 
 @dataclass(frozen=True)
+class UserIdentity:
+    id: UUID
+    username: str
+    first_name: str
+    last_name: str
+
+
+@dataclass(frozen=True)
 class Registration:
     username: str
     first_name: str

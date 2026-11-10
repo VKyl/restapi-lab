@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from kmartists.domain.errors import AuthenticationError, ConflictError
-from kmartists.domain.users import MicrosoftRegistration, PasswordRegistration, Registration, UserReference
+from kmartists.domain.users import MicrosoftRegistration, PasswordRegistration, Registration, UserIdentity
 from kmartists.interfaces.users import UserRepository
 
 
@@ -9,24 +9,24 @@ class UserUseCases:
     def __init__(self, users: UserRepository) -> None:
         self._users = users
 
-    def register(self, registration: PasswordRegistration) -> UserReference:
+    def register(self, registration: PasswordRegistration) -> UserIdentity:
         self._ensure_can_register(registration)
         return self._users.create_user(registration)
 
-    def register_with_microsoft(self, registration: MicrosoftRegistration) -> UserReference:
+    def register_with_microsoft(self, registration: MicrosoftRegistration) -> UserIdentity:
         if self._users.microsoft_account_exists(registration.microsoft_id):
             raise ConflictError("This Microsoft account is already registered.")
         self._ensure_can_register(registration)
         return self._users.create_microsoft_user(registration)
 
-    def log_in(self, username: str, password: str) -> UserReference:
+    def log_in(self, username: str, password: str) -> UserIdentity:
         user = self._users.authenticate(username, password)
         if user is None:
             raise AuthenticationError("Invalid username or password.")
         return user
 
-    def refresh(self, user_id: UUID) -> UserReference:
-        user = self._users.find_reference(user_id)
+    def refresh(self, user_id: UUID) -> UserIdentity:
+        user = self._users.find_identity(user_id)
         if user is None:
             raise AuthenticationError("User no longer exists.")
         return user

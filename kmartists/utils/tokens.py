@@ -6,7 +6,7 @@ import jwt
 from django.conf import settings
 
 from kmartists.domain.errors import AuthenticationError
-from kmartists.domain.users import UserReference
+from kmartists.domain.users import UserIdentity
 from kmartists.utils.serialization import SerializableMixin
 
 TOKEN_ALGORITHM = "HS256"
@@ -22,18 +22,20 @@ class TokenPair(SerializableMixin):
     refresh_token: str
 
 
-def issue_tokens(user: UserReference) -> TokenPair:
+def issue_tokens(user: UserIdentity) -> TokenPair:
     return TokenPair(
         token=encode_token(user, ACCESS_TOKEN_TYPE, ACCESS_TOKEN_LIFETIME),
         refresh_token=encode_token(user, REFRESH_TOKEN_TYPE, REFRESH_TOKEN_LIFETIME),
     )
 
 
-def encode_token(user: UserReference, token_type: str, lifetime: timedelta) -> str:
+def encode_token(user: UserIdentity, token_type: str, lifetime: timedelta) -> str:
     issued_at = datetime.now(UTC)
     payload = {
         "id": str(user.id),
-        "username": user.name,
+        "username": user.username,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
         "type": token_type,
         "iat": issued_at,
         "exp": issued_at + lifetime,

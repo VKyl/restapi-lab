@@ -12,6 +12,7 @@ from kmartists.domain.users import (
     MAX_USERNAME_LENGTH,
     MicrosoftRegistration,
     PasswordRegistration,
+    UserIdentity,
     UserReference,
 )
 
@@ -51,7 +52,7 @@ class User(models.Model):
         return cls.objects.filter(microsoft_id=microsoft_id).exists()
 
     @classmethod
-    def create_user(cls, registration: PasswordRegistration) -> UserReference:
+    def create_user(cls, registration: PasswordRegistration) -> UserIdentity:
         try:
             record = cls.objects.create(
                 name=registration.username,
@@ -62,10 +63,10 @@ class User(models.Model):
             )
         except IntegrityError as error:
             raise ConflictError("A user with this username or email already exists.") from error
-        return record.to_reference()
+        return record.to_identity()
 
     @classmethod
-    def create_microsoft_user(cls, registration: MicrosoftRegistration) -> UserReference:
+    def create_microsoft_user(cls, registration: MicrosoftRegistration) -> UserIdentity:
         try:
             record = cls.objects.create(
                 name=registration.username,
@@ -76,17 +77,20 @@ class User(models.Model):
             )
         except IntegrityError as error:
             raise ConflictError("A user with this username, email or Microsoft account already exists.") from error
-        return record.to_reference()
+        return record.to_identity()
 
     @classmethod
-    def authenticate(cls, username: str, password: str) -> UserReference | None:
+    def authenticate(cls, username: str, password: str) -> UserIdentity | None:
         user = cls.objects.filter(name=username).first()
-        return user.to_reference() if user and check_password(password, user.password) else None
+        return user.to_identity() if user and check_password(password, user.password) else None
 
     @classmethod
-    def find_reference(cls, user_id: UUID) -> UserReference | None:
+    def find_identity(cls, user_id: UUID) -> UserIdentity | None:
         user = cls.objects.filter(id=user_id).first()
-        return user.to_reference() if user else None
+        return user.to_identity() if user else None
 
     def to_reference(self) -> UserReference:
         return UserReference(id=self.id, name=self.name)
+
+    def to_identity(self) -> UserIdentity:
+        return UserIdentity(id=self.id, username=self.name, first_name=self.first_name, last_name=self.last_name)

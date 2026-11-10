@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from kmartists import models
-from kmartists.domain.users import MicrosoftRegistration, PasswordRegistration, UserReference
+from kmartists.domain.users import MicrosoftRegistration, PasswordRegistration, UserIdentity
 from kmartists.use_cases.users import UserUseCases
 from kmartists.utils.microsoft import read_microsoft_token
 from kmartists.utils.tokens import issue_tokens, read_refresh_token
@@ -52,7 +52,7 @@ class RegisterController(APIView):
             user = user_use_cases.register(body.validated_data)
         return Response(issue_tokens(user).serialize(), status=status.HTTP_201_CREATED)
 
-    def _register_with_microsoft(self, request: Request) -> UserReference:
+    def _register_with_microsoft(self, request: Request) -> UserIdentity:
         body = MicrosoftRegisterRequest(data=request.data)
         body.is_valid(raise_exception=True)
         fields = dict(body.validated_data)

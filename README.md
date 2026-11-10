@@ -272,7 +272,7 @@ Response body:
     }
 ```
 
-Auth endpoints return JWTs signed with HS256 and payload `{ "sub": user id, "username": string, "type": "access" | "refresh", "iat": number, "exp": number }`. `token` is valid for 15 minutes, `refresh_token` for 7 days.
+Auth endpoints return JWTs signed with HS256 and payload `{ "id": string, "username": string, "first_name": string, "last_name": string, "type": "access" | "refresh", "iat": number, "exp": number }`. `token` is valid for 15 minutes, `refresh_token` for 7 days.
 
 ### Users
 
