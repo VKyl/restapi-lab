@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from kmartists.domain.errors import AuthenticationError, ConflictError
+from kmartists.domain.errors import AuthenticationError, ConflictError, NotFoundError
 from kmartists.domain.users import MicrosoftRegistration, PasswordRegistration, Registration, UserIdentity
 from kmartists.interfaces.users import UserRepository
 
@@ -19,10 +19,16 @@ class UserUseCases:
         self._ensure_can_register(registration)
         return self._users.create_microsoft_user(registration)
 
-    def log_in(self, username: str, password: str) -> UserIdentity:
-        user = self._users.authenticate(username, password)
+    def log_in(self, login: str, password: str) -> UserIdentity:
+        user = self._users.authenticate(login, password)
         if user is None:
-            raise AuthenticationError("Invalid username or password.")
+            raise AuthenticationError("Invalid login or password.")
+        return user
+
+    def log_in_with_microsoft(self, microsoft_id: str) -> UserIdentity:
+        user = self._users.find_microsoft_identity(microsoft_id)
+        if user is None:
+            raise NotFoundError("No user is registered with this Microsoft account.")
         return user
 
     def refresh(self, user_id: UUID) -> UserIdentity:

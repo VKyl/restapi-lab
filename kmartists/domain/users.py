@@ -36,6 +36,8 @@ class Registration:
 
     def validate(self) -> None:
         require_text("username", self.username, MAX_USERNAME_LENGTH)
+        if "@" in self.username:
+            raise ValidationError("username", "Username must not contain @.")
         limit_text("first_name", self.first_name, MAX_FIRST_NAME_LENGTH)
         limit_text("last_name", self.last_name, MAX_LAST_NAME_LENGTH)
         require_text("email", self.email, MAX_EMAIL_LENGTH)

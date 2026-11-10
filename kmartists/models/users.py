@@ -80,13 +80,19 @@ class User(models.Model):
         return record.to_identity()
 
     @classmethod
-    def authenticate(cls, username: str, password: str) -> UserIdentity | None:
-        user = cls.objects.filter(name=username).first()
+    def authenticate(cls, login: str, password: str) -> UserIdentity | None:
+        lookup = {"email__iexact": login} if "@" in login else {"name": login}
+        user = cls.objects.filter(**lookup).first()
         return user.to_identity() if user and check_password(password, user.password) else None
 
     @classmethod
     def find_identity(cls, user_id: UUID) -> UserIdentity | None:
         user = cls.objects.filter(id=user_id).first()
+        return user.to_identity() if user else None
+
+    @classmethod
+    def find_microsoft_identity(cls, microsoft_id: str) -> UserIdentity | None:
+        user = cls.objects.filter(microsoft_id=microsoft_id).first()
         return user.to_identity() if user else None
 
     def to_reference(self) -> UserReference:

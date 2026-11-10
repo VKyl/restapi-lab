@@ -34,8 +34,12 @@ class MicrosoftRegisterRequest(serializers.Serializer):
 
 
 class LoginRequest(serializers.Serializer):
-    username = serializers.CharField()
+    login = serializers.CharField()
     password = serializers.CharField(trim_whitespace=False)
+
+
+class MicrosoftLoginRequest(serializers.Serializer):
+    microsoft_token = serializers.CharField()
 
 
 class RefreshRequest(serializers.Serializer):
@@ -63,10 +67,19 @@ class RegisterController(APIView):
 
 class LoginController(APIView):
     def post(self, request: Request) -> Response:
-        body = LoginRequest(data=request.data)
-        body.is_valid(raise_exception=True)
-        user = user_use_cases.log_in(**body.validated_data)
+        if "microsoft_token" in request.data:
+            user = self._log_in_with_microsoft(request)
+        else:
+            body = LoginRequest(data=request.data)
+            body.is_valid(raise_exception=True)
+            user = user_use_cases.log_in(**body.validated_data)
         return Response(issue_tokens(user).serialize())
+
+    def _log_in_with_microsoft(self, request: Request) -> UserIdentity:
+        body = MicrosoftLoginRequest(data=request.data)
+        body.is_valid(raise_exception=True)
+        identity = read_microsoft_token(body.validated_data["microsoft_token"])
+        return user_use_cases.log_in_with_microsoft(identity.id)
 
 
 class RefreshController(APIView):

@@ -198,7 +198,7 @@ Request body:
 
 ### Auth
 
-`POST` /kmartists/register/ - Register a new user. `first_name` and `last_name` are optional. Password must be at least 8 characters long and contain a lowercase letter, an uppercase letter and a digit.
+`POST` /kmartists/register/ - Register a new user. `first_name` and `last_name` are optional. Username must not contain `@`. Password must be at least 8 characters long and contain a lowercase letter, an uppercase letter and a digit.
 
 Request body:
 
@@ -233,14 +233,22 @@ Response body:
     }
 ```
 
-`POST` /kmartists/login/ - Log in with username and password
+`POST` /kmartists/login/ - Log in with username or email and password. `login` is treated as an email when it contains `@`, otherwise as a username
 
 Request body:
 
 ```json
     {
-        "username": string,
+        "login": string,
         "password": string
+    }
+```
+
+Request body for users who registered with Microsoft. Returns `404` when no user is registered with this Microsoft account.
+
+```json
+    {
+        "microsoft_token": string
     }
 ```
 
