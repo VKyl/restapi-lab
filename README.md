@@ -371,6 +371,12 @@ Request body:
     }
 ```
 
+## Tests
+
+```bash
+scripts/test.sh
+```
+
 ## Database diagram
 
 ![Database diagram](db_diagram.png)
