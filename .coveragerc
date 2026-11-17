@@ -1,0 +1,6 @@
+[run]
+source = kmartists
+omit =
+    kmartists/migrations/*
+    kmartists/asgi.py
+    kmartists/wsgi.py
