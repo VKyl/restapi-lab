@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "corsheaders",
     "rest_framework",
+    "drf_spectacular",
     "kmartists",
 ]
 
@@ -29,6 +30,13 @@ MIDDLEWARE = [
 ROOT_URLCONF = "kmartists.urls"
 
 WSGI_APPLICATION = "kmartists.wsgi.application"
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "APP_DIRS": True,
+    }
+]
 
 DATABASES = {
     "default": {
@@ -54,6 +62,24 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
     "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
     "EXCEPTION_HANDLER": "kmartists.utils.error_handling.handle_exception",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "KMArtists API",
+    "DESCRIPTION": "REST API of the KMArtists music forum: artist articles, events, musicians and auth.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "APPEND_COMPONENTS": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Access token from register, login or refresh. Valid for 15 minutes.",
+            }
+        }
+    },
 }
 
 MICROSOFT_CLIENT_ID = os.environ.get("MICROSOFT_CLIENT_ID", "")
