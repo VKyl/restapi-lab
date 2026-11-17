@@ -1,3 +1,4 @@
+import logging
 from uuid import UUID
 
 from kmartists.domain.articles import ArticleSummary
@@ -14,6 +15,8 @@ from kmartists.domain.users import (
 from kmartists.interfaces.articles import ArticleRepository
 from kmartists.interfaces.users import UserRepository
 from kmartists.utils.pagination import Page
+
+logger = logging.getLogger(__name__)
 
 
 class UserUseCase:
@@ -38,6 +41,7 @@ class UserUseCase:
 
     def update_profile(self, user_id: UUID, profile: Profile, requester_id: UUID) -> None:
         if user_id != requester_id:
+            logger.warning("User %s tried to update profile of user %s", requester_id, user_id)
             raise ForbiddenError("Only the profile owner can change this profile.")
         current = self.get_profile(user_id)
         profile.validate()
@@ -47,29 +51,37 @@ class UserUseCase:
 
     def register(self, registration: PasswordRegistration) -> UserIdentity:
         self._ensure_can_register(registration)
-        return self._users.create_user(registration)
+        user = self._users.create_user(registration)
+        logger.info("User %s registered as %s", user.id, user.username)
+        return user
 
     def register_with_microsoft(self, registration: MicrosoftRegistration) -> UserIdentity:
         if self._users.microsoft_account_exists(registration.microsoft_id):
             raise ConflictError("This Microsoft account is already registered.")
         self._ensure_can_register(registration)
-        return self._users.create_microsoft_user(registration)
+        user = self._users.create_microsoft_user(registration)
+        logger.info("User %s registered as %s with Microsoft", user.id, user.username)
+        return user
 
     def log_in(self, login: str, password: str) -> UserIdentity:
         user = self._users.authenticate(login, password)
         if user is None:
+            logger.warning("Failed login attempt with wrong login or password")
             raise AuthenticationError("Invalid login or password.")
+        logger.info("User %s logged in", user.id)
         return user
 
     def log_in_with_microsoft(self, microsoft_id: str) -> UserIdentity:
         user = self._users.find_microsoft_identity(microsoft_id)
         if user is None:
             raise NotFoundError("No user is registered with this Microsoft account.")
+        logger.info("User %s logged in with Microsoft", user.id)
         return user
 
     def get_identity(self, user_id: UUID) -> UserIdentity:
         user = self._users.find_identity(user_id)
         if user is None:
+            logger.warning("Valid token presented for deleted user %s", user_id)
             raise AuthenticationError("User no longer exists.")
         return user
 

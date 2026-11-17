@@ -1,3 +1,4 @@
+import logging
 from datetime import date as calendar_date
 from uuid import UUID
 
@@ -6,6 +7,8 @@ from kmartists.domain.events import Event, EventDetails, EventSummary
 from kmartists.interfaces.events import EventRepository
 from kmartists.use_cases.users import UserUseCase
 from kmartists.utils.pagination import Page
+
+logger = logging.getLogger(__name__)
 
 
 class EventUseCase:
@@ -47,5 +50,6 @@ class EventUseCase:
     def _get_own_event(self, event_id: UUID, user_id: UUID) -> EventDetails:
         event = self.get_event(event_id)
         if event.creator.id != user_id:
+            logger.warning("User %s tried to change event %s they do not own", user_id, event_id)
             raise ForbiddenError("Only the event creator can change this event.")
         return event

@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
@@ -14,6 +15,8 @@ ACCESS_TOKEN_TYPE = "access"
 REFRESH_TOKEN_TYPE = "refresh"
 ACCESS_TOKEN_LIFETIME = timedelta(minutes=15)
 REFRESH_TOKEN_LIFETIME = timedelta(days=7)
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -55,7 +58,9 @@ def read_token(token: str, token_type: str, error_message: str) -> UUID:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[TOKEN_ALGORITHM])
     except jwt.InvalidTokenError as error:
+        logger.debug("Rejected %s token: %s", token_type, error)
         raise AuthenticationError(error_message) from error
     if payload.get("type") != token_type:
+        logger.debug("Rejected %s token: got a %s token instead", token_type, payload.get("type"))
         raise AuthenticationError(error_message)
     return UUID(payload["id"])

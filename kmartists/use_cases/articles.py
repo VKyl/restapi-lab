@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Sequence
 from dataclasses import replace
 from uuid import UUID
@@ -7,6 +8,8 @@ from kmartists.domain.errors import ConflictError, ForbiddenError, NotFoundError
 from kmartists.interfaces.articles import ArticleRepository
 from kmartists.use_cases.users import UserUseCase
 from kmartists.utils.pagination import Page
+
+logger = logging.getLogger(__name__)
 
 
 class ArticleUseCase:
@@ -46,5 +49,6 @@ class ArticleUseCase:
     def delete_article(self, article_id: UUID, user_id: UUID) -> None:
         article = self.get_article(article_id)
         if article.author is None or article.author.id != user_id:
+            logger.warning("User %s tried to delete article %s they do not own", user_id, article_id)
             raise ForbiddenError("Only the article author can delete this article.")
         self._articles.delete_article(article_id)
