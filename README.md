@@ -28,6 +28,10 @@ On this page profile owner can configure his nickname (which must be unique acro
 
 For view all the information above is available, plus articles that were written/participated by the person.
 
+## API documentation
+
+Swagger UI: <http://127.0.0.1:8000/api/docs/>
+
 ## Core Endpoints
 
 ### Authentication
@@ -369,6 +373,12 @@ Request body:
         "looking_for_band": boolean,
         "location": string
     }
+```
+
+## Tests
+
+```bash
+scripts/test.sh
 ```
 
 ## Database diagram

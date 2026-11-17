@@ -39,8 +39,10 @@ class Page[T: SerializableMixin]:
 
 
 class PageQuery(serializers.Serializer):
-    take = serializers.IntegerField(min_value=1, max_value=MAX_TAKE, default=DEFAULT_TAKE)
-    skip = serializers.IntegerField(min_value=0, default=0)
+    take = serializers.IntegerField(
+        min_value=1, max_value=MAX_TAKE, default=DEFAULT_TAKE, help_text="Number of records to return."
+    )
+    skip = serializers.IntegerField(min_value=0, default=0, help_text="Number of records to skip.")
 
 
 def paginate[M: Model, T: SerializableMixin](

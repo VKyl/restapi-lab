@@ -1,4 +1,5 @@
 from django.urls import path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from kmartists.controllers.articles import ArticleCollectionController, ArticleController, GenreCollectionController
 from kmartists.controllers.events import EventCollectionController, EventController
@@ -23,6 +24,8 @@ urlpatterns = [
     path("kmartists/users/musicians/", MusicianCollectionController.as_view(), name="musician-collection"),
     path("kmartists/users/<uuid:user_id>/", UserController.as_view(), name="user-detail"),
     path("kmartists/users/<uuid:user_id>/articles/", UserArticleCollectionController.as_view(), name="user-articles"),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
 ]
 
 handler404 = "kmartists.utils.error_handling.not_found"
